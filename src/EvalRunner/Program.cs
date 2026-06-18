@@ -1,4 +1,5 @@
-﻿using EvalRunner.Assistant;
+﻿using EvalRunner.Anthropic;
+using EvalRunner.Assistant;
 using EvalRunner.Judge;
 using EvalRunner.Models;
 using EvalRunner.Rag;
@@ -47,7 +48,18 @@ public static class Program
         AssistantClient? assistant = liveMode ? new AssistantClient(httpClient, apiKey) : null;
 
         var pipeline = new EvalPipeline(retriever, judge, new ThresholdConfig(), liveMode, assistant);
-        var results = await pipeline.RunAsync(testCases);
+
+        IReadOnlyList<EvalRunResult> results;
+        try
+        {
+            results = await pipeline.RunAsync(testCases);
+        }
+        catch (AnthropicApiException ex) when (ex.StopsRun)
+        {
+            ex.WriteFatalBanner(Console.Error);
+            return 2;
+        }
+
         var summary = ThresholdGate.Evaluate(results, new ThresholdConfig());
 
         ConsoleReporter.PrintResults(results, summary);

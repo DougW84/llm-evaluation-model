@@ -23,15 +23,42 @@ Exit code `1` on threshold breach — same mental model as a failing xUnit test 
 ## Prerequisites
 
 - [.NET 9 SDK](https://dotnet.microsoft.com/download)
-- Anthropic API key
+- **Anthropic API key** (required to run evaluations — see Setup below)
 
 ## Setup
 
+### 1. Clone and open the project
+
 ```powershell
-cd c:\Projects\llm-evaluation-model
-copy .env.example .env
-# Edit .env and set ANTHROPIC_API_KEY
+git clone https://github.com/DougW84/llm-evaluation-model.git
+cd llm-evaluation-model
 ```
+
+### 2. Add your Anthropic API key
+
+This project calls the **Anthropic API** to run an **LLM-as-judge** - Claude scores each test response on grounding, accuracy, tone, and escalation. In `--live` mode, Claude also generates the assistant responses.
+
+This is **not** the same as a Claude.ai chat subscription. You need a separate API key from the Anthropic developer console.
+
+1. Go to [console.anthropic.com](https://console.anthropic.com/) and sign in (or create an account).
+2. Open **API Keys** and create a new key.
+3. Copy the key - it is only shown once.
+
+API usage is billed per request. Replay mode makes ~16 judge calls per run; `--live` mode makes additional calls to generate responses.
+
+### 3. Save the key locally
+
+```powershell
+copy .env.example .env
+```
+
+Edit `.env` and replace the placeholder with your key:
+
+```
+ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
+```
+
+`.env` is gitignored and will not be committed. Never push your API key to GitHub.
 
 ## Run
 
@@ -47,6 +74,26 @@ dotnet run --project src/EvalRunner -- --category escalation
 
 # Unit tests (no API key needed)
 dotnet test
+```
+
+### Exit codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | All thresholds passed |
+| `1` | Evaluation completed but thresholds failed (or missing API key / data files) |
+| `2` | **Anthropic API error** — run stopped early (billing, auth, rate limit). Remaining cases skipped. |
+
+If credits run out or your API key is invalid, you'll see a banner like:
+
+```
+*** ANTHROPIC API ERROR — RUN STOPPED ***
+
+Billing error — your Anthropic credit balance may be exhausted. Add credits at https://console.anthropic.com/settings/billing
+Failed on test case: 005
+Completed 4 of 16 cases before stopping.
+
+No further API calls will be made. Remaining test cases were skipped.
 ```
 
 ## Project structure
@@ -68,3 +115,4 @@ src/EvalRunner/
 - Replay mode still calls the **judge** API once per test case (~16 calls per run).
 - Results are written to a timestamped file under `results/` (e.g. `eval-results-2026-06-18_143022.json`) for drift tracking later. Override with `--output path/to/file.json`.
 - Stretch goals: GitHub Actions CI gate, judge consistency checks, mock tool-call assertions.
+- This project also contains tests for the AnthropicApiExceptionHandler. To run the tests in Powershell, change to `llm-evaluation-model\tests\EvalRunner.Tests` and run `dotnet test --filter "FullyQualifiedName~AnthropicApiExceptionTests"`

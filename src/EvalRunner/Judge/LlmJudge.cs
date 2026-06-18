@@ -1,7 +1,7 @@
-using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using EvalRunner.Anthropic;
 using EvalRunner.Models;
 
 namespace EvalRunner.Judge;
@@ -47,10 +47,7 @@ public class LlmJudge
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
 
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new InvalidOperationException($"Anthropic API error ({(int)response.StatusCode}): {body}");
-        }
+        AnthropicHttp.EnsureSuccess((int)response.StatusCode, body);
 
         using var doc = JsonDocument.Parse(body);
         var content = doc.RootElement

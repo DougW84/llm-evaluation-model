@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using EvalRunner.Anthropic;
 using EvalRunner.Assistant;
 using EvalRunner.Guardrails;
 using EvalRunner.Judge;
@@ -80,6 +81,10 @@ public class EvalPipeline
 
             result.Score = await _judge.EvaluateAsync(testCase, result.RetrievedContext, result.AiResponse, cancellationToken);
             result.Passed = ThresholdGate.CasePassed(result, _thresholdConfig);
+        }
+        catch (AnthropicApiException)
+        {
+            throw;
         }
         catch (Exception ex)
         {

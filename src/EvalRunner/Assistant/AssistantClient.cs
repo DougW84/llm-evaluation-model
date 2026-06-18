@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using EvalRunner.Anthropic;
 
 namespace EvalRunner.Assistant;
 
@@ -51,10 +52,7 @@ public class AssistantClient
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
 
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new InvalidOperationException($"Anthropic API error ({(int)response.StatusCode}): {body}");
-        }
+        AnthropicHttp.EnsureSuccess((int)response.StatusCode, body);
 
         using var doc = JsonDocument.Parse(body);
         return doc.RootElement
