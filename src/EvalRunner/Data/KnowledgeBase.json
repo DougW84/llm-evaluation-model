@@ -1,0 +1,71 @@
+{
+  "students": [
+    {
+      "studentId": "S12345",
+      "name": "Alex Morgan",
+      "roomAssignment": "Building A, Room 204 (shared double)",
+      "contractType": "standard",
+      "rentDueDate": "1st of each month",
+      "currentBalance": 0,
+      "transferEligibility": "Not eligible for single-room upgrade this semester. Shared room only per contract.",
+      "openMaintenanceTickets": []
+    },
+    {
+      "studentId": "S67890",
+      "name": "Jordan Lee",
+      "roomAssignment": "Building B, Room 112 (shared double)",
+      "contractType": "standard",
+      "rentDueDate": "1st of each month",
+      "currentBalance": 450.00,
+      "transferEligibility": "Eligible for room swap with mutual consent and housing office approval.",
+      "openMaintenanceTickets": ["Leaking faucet in bathroom"]
+    },
+    {
+      "studentId": "S11111",
+      "name": "Sam Taylor",
+      "roomAssignment": "Building C, Room 301 (single)",
+      "contractType": "premium",
+      "rentDueDate": "1st of each month",
+      "currentBalance": 0,
+      "transferEligibility": "Eligible for transfer to another single room if availability exists.",
+      "openMaintenanceTickets": []
+    },
+    {
+      "studentId": "S22222",
+      "name": "Casey Rivera",
+      "roomAssignment": "Building A, Room 105 (shared double)",
+      "contractType": "standard",
+      "rentDueDate": "1st of each month",
+      "currentBalance": 1200.00,
+      "transferEligibility": "Transfer requests on hold until outstanding balance is resolved.",
+      "openMaintenanceTickets": ["Broken window latch"]
+    }
+  ],
+  "policies": [
+    {
+      "id": "room-transfer",
+      "keywords": ["transfer", "swap", "switch", "room", "move", "single", "double"],
+      "content": "Room transfer policy: Students in shared rooms may request a swap with another student's consent. Single-room upgrades are not available during the current semester. All transfer requests require housing office approval. Students with outstanding balances above $500 cannot initiate transfers until balance is below threshold."
+    },
+    {
+      "id": "rent-billing",
+      "keywords": ["rent", "due", "balance", "payment", "billing", "owe", "pay"],
+      "content": "Rent billing policy: Rent is due on the 1st of each month. Late fees apply after the 5th. Students can view current balance in the housing portal. Payment plans available for balances over $1000."
+    },
+    {
+      "id": "maintenance",
+      "keywords": ["maintenance", "repair", "broken", "fix", "leak", "ticket"],
+      "content": "Maintenance policy: Submit maintenance requests through the housing portal. Emergency repairs (flooding, no heat) are prioritized within 4 hours. Non-emergency requests are addressed within 3 business days."
+    },
+    {
+      "id": "guest-policy",
+      "keywords": ["guest", "visitor", "overnight", "policy"],
+      "content": "Guest policy: Overnight guests permitted up to 3 consecutive nights with roommate consent. All guests must sign in at the front desk."
+    },
+    {
+      "id": "ambiguous-eligibility",
+      "keywords": ["exception", "special", "circumstance", "medical", "hardship"],
+      "content": "Special circumstances policy: Eligibility exceptions for medical hardship or documented special circumstances require review by a housing advisor. The AI assistant cannot approve exceptions and must escalate to a human advisor."
+    }
+  ]
+}
