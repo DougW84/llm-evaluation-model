@@ -40,12 +40,13 @@ public static class Program
                 .ToList();
         }
 
-        Console.WriteLine($"Running evaluation: {testCases.Count} cases | Mode: {(liveMode ? "LIVE" : "REPLAY")}");
+        Console.WriteLine($"Running evaluation: {testCases.Count} cases | Mode: {(liveMode ? "LIVE" : "REPLAY")} | Model: {AnthropicSettings.GetModel()}");
 
         var retriever = MockRagRetriever.LoadFromFile(knowledgeBasePath);
         using var httpClient = new HttpClient();
-        var judge = new LlmJudge(httpClient, apiKey);
-        AssistantClient? assistant = liveMode ? new AssistantClient(httpClient, apiKey) : null;
+        var model = AnthropicSettings.GetModel();
+        var judge = new LlmJudge(httpClient, apiKey, model);
+        AssistantClient? assistant = liveMode ? new AssistantClient(httpClient, apiKey, model) : null;
 
         var pipeline = new EvalPipeline(retriever, judge, new ThresholdConfig(), liveMode, assistant);
 
@@ -54,7 +55,7 @@ public static class Program
         {
             results = await pipeline.RunAsync(testCases);
         }
-        catch (AnthropicApiException ex) when (ex.StopsRun)
+        catch (AnthropicApiException ex)
         {
             ex.WriteFatalBanner(Console.Error);
             return 2;
@@ -65,7 +66,8 @@ public static class Program
         ConsoleReporter.PrintResults(results, summary);
         ConsoleReporter.WriteJsonResults(outputPath, results, summary);
 
-        return summary.AllPassed ? 0 : 1;
+        var allDetectionPassed = results.All(r => r.DetectionPassed);
+        return allDetectionPassed ? 0 : 1;
     }
 
     private static string GetDefaultResultsPath()

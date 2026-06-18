@@ -37,6 +37,17 @@ public class AnthropicApiExceptionTests
     }
 
     [Fact]
+    public void FromResponse_ModelNotFound_StopsRun()
+    {
+        var body = """{"type":"error","error":{"type":"not_found_error","message":"model: claude-sonnet-4-20250514"}}""";
+
+        var ex = AnthropicApiException.FromResponse(404, body);
+
+        Assert.True(ex.StopsRun);
+        Assert.Contains("claude-sonnet-4-6", ex.UserFacingMessage);
+    }
+
+    [Fact]
     public void WriteFatalBanner_IncludesTestCaseContext()
     {
         var ex = AnthropicApiException.FromResponse(402, """{"error":{"type":"billing_error","message":"low balance"}}""");

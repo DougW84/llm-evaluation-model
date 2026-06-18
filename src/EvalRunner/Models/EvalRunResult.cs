@@ -9,5 +9,6 @@ public class EvalRunResult
     public List<string> GuardrailViolations { get; set; } = [];
     public long ElapsedMs { get; set; }
     public bool Passed { get; set; }
+    public bool DetectionPassed { get; set; }
     public string? Error { get; set; }
 }

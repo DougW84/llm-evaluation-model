@@ -11,7 +11,7 @@ public class AnthropicApiException : Exception
     public int CompletedCases { get; set; }
     public int TotalCases { get; set; }
 
-    public bool StopsRun => StatusCode is 401 or 402 or 403 or 429;
+    public bool StopsRun => StatusCode is 400 or 401 or 402 or 403 or 404 or 429;
 
     public AnthropicApiException(int statusCode, string? apiErrorType, string? apiMessage)
         : base(apiMessage ?? $"Anthropic API error ({statusCode})")
@@ -50,14 +50,30 @@ public class AnthropicApiException : Exception
         return new AnthropicApiException(statusCode, errorType, message);
     }
 
-    public string UserFacingMessage => StatusCode switch
+    public string UserFacingMessage
     {
-        401 => "Invalid or missing API key. Check ANTHROPIC_API_KEY in your .env file.",
-        402 => "Billing error — your Anthropic credit balance may be exhausted. Add credits at https://console.anthropic.com/settings/billing",
-        403 => "API key does not have permission to use this model.",
-        429 => "Rate limit exceeded. Wait a few minutes and try again.",
-        _ => ApiMessage ?? $"Anthropic API returned HTTP {StatusCode}."
-    };
+        get
+        {
+            if (StatusCode == 404 || ApiErrorType == "not_found_error")
+            {
+                return $"Model not found ({ApiMessage}). Check ANTHROPIC_MODEL in .env — default is {AnthropicSettings.DefaultModel}.";
+            }
+
+            if (StatusCode == 400 && ApiMessage?.Contains("model", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return $"Invalid model ({ApiMessage}). Set ANTHROPIC_MODEL in .env or use {AnthropicSettings.DefaultModel}.";
+            }
+
+            return StatusCode switch
+            {
+                401 => "Invalid or missing API key. Check ANTHROPIC_API_KEY in your .env file.",
+                402 => "Billing error — your Anthropic credit balance may be exhausted. Add credits at https://console.anthropic.com/settings/billing",
+                403 => "API key does not have permission to use this model.",
+                429 => "Rate limit exceeded. Wait a few minutes and try again.",
+                _ => ApiMessage ?? $"Anthropic API returned HTTP {StatusCode}."
+            };
+        }
+    }
 
     public void WriteFatalBanner(TextWriter writer)
     {

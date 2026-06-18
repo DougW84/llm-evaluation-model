@@ -81,6 +81,7 @@ public class EvalPipeline
 
             result.Score = await _judge.EvaluateAsync(testCase, result.RetrievedContext, result.AiResponse, cancellationToken);
             result.Passed = ThresholdGate.CasePassed(result, _thresholdConfig);
+            result.DetectionPassed = DetectionEvaluator.EvaluateDetection(result);
         }
         catch (AnthropicApiException)
         {
@@ -118,33 +119,36 @@ public static class DataLoader
 
 public static class EnvLoader
 {
-    public static string? GetApiKey()
+    public static string? GetApiKey() => GetEnvValue("ANTHROPIC_API_KEY");
+
+    public static IEnumerable<string> GetEnvFilePaths() =>
+    [
+        Path.Combine(Directory.GetCurrentDirectory(), ".env"),
+        Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", ".env"),
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", ".env"))
+    ];
+
+    public static string? GetEnvValue(string key)
     {
-        var fromEnv = Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY");
+        var fromEnv = Environment.GetEnvironmentVariable(key);
         if (!string.IsNullOrWhiteSpace(fromEnv))
         {
             return fromEnv;
         }
 
-        var candidates = new[]
-        {
-            Path.Combine(Directory.GetCurrentDirectory(), ".env"),
-            Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", ".env"),
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", ".env"))
-        };
-
-        foreach (var path in candidates.Select(Path.GetFullPath).Distinct())
+        foreach (var path in GetEnvFilePaths().Select(Path.GetFullPath).Distinct())
         {
             if (!File.Exists(path))
             {
                 continue;
             }
 
+            var prefix = key + "=";
             foreach (var line in File.ReadAllLines(path))
             {
-                if (line.StartsWith("ANTHROPIC_API_KEY=", StringComparison.Ordinal))
+                if (line.StartsWith(prefix, StringComparison.Ordinal))
                 {
-                    return line["ANTHROPIC_API_KEY=".Length..].Trim().Trim('"');
+                    return line[prefix.Length..].Trim().Trim('"');
                 }
             }
         }

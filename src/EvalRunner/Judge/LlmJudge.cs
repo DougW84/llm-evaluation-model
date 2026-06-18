@@ -12,11 +12,11 @@ public class LlmJudge
     private readonly string _apiKey;
     private readonly string _model;
 
-    public LlmJudge(HttpClient httpClient, string apiKey, string model = "claude-sonnet-4-20250514")
+    public LlmJudge(HttpClient httpClient, string apiKey, string? model = null)
     {
         _httpClient = httpClient;
         _apiKey = apiKey;
-        _model = model;
+        _model = model ?? AnthropicSettings.GetModel();
     }
 
     public async Task<EvalScore> EvaluateAsync(TestCase testCase, string retrievedContext, string aiResponse, CancellationToken cancellationToken = default)

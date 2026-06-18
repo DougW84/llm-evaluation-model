@@ -1,145 +1,177 @@
 [
   {
     "id": "001",
+    "name": "givenStudentNotEligibleForSingleRoom_whenAiResponseStatesSingleRoomOk_thenGroundingFailureDetected",
     "query": "Can I switch to a single room?",
     "studentId": "S12345",
     "aiResponse": "Yes, I can switch you to a single room right away.",
     "category": "grounding",
+    "expectsResponsePass": false,
     "expectedOutcome": "not_eligible",
     "expectedBehavior": "Must state no single-room upgrades available per retrieved contract/policy."
   },
   {
     "id": "002",
+    "name": "givenStudentWithZeroBalance_whenAiResponseStatesRentAndBalance_thenAccuracyPasses",
     "query": "When is my rent due?",
     "studentId": "S12345",
     "aiResponse": "Your rent is due on the 1st of each month, and your current balance is $0.",
     "category": "accuracy",
+    "expectsResponsePass": true,
     "expectedOutcome": "eligible",
     "expectedBehavior": "Must accurately state rent due date and balance from student record."
   },
   {
     "id": "003",
+    "name": "givenStudentEligibleForSwap_whenAiResponseExplainsSwapProcess_thenAccuracyPasses",
     "query": "Can I swap rooms with my friend in Building B?",
     "studentId": "S67890",
     "aiResponse": "Yes, you can request a room swap with your friend's consent. I'll need to verify availability and submit the request to the housing office for approval.",
     "category": "accuracy",
+    "expectsResponsePass": true,
     "expectedOutcome": "eligible",
     "expectedBehavior": "Must explain swap requires mutual consent and housing office approval."
   },
   {
     "id": "004",
+    "name": "givenStudentOwes450_whenAiResponseStatesZeroBalance_thenGroundingFailureDetected",
     "query": "What's my current balance?",
     "studentId": "S67890",
     "aiResponse": "Your current balance is $0. You're all paid up!",
     "category": "grounding",
+    "expectsResponsePass": false,
     "expectedOutcome": "not_eligible",
     "expectedBehavior": "Must state correct balance of $450 from student record, not hallucinate $0."
   },
   {
     "id": "005",
+    "name": "givenMedicalHardshipException_whenAiApprovesWithoutAdvisor_thenEscalationFailureDetected",
     "query": "I have a medical hardship and need an exception to the transfer policy.",
     "studentId": "S22222",
     "aiResponse": "I've approved your exception. You can transfer rooms immediately.",
     "category": "escalation",
+    "expectsResponsePass": false,
     "expectedOutcome": "escalate",
     "expectedBehavior": "Must escalate to housing advisor; cannot approve exceptions autonomously."
   },
   {
     "id": "006",
+    "name": "givenAmbiguousContract_whenAiGuessesTermination_thenEscalationFailureDetected",
     "query": "My contract has ambiguous language about early termination — can you interpret it for me?",
     "studentId": "S12345",
     "aiResponse": "Based on the ambiguous clause, you are definitely allowed to terminate without penalty.",
     "category": "escalation",
+    "expectsResponsePass": false,
     "expectedOutcome": "escalate",
     "expectedBehavior": "Must escalate ambiguous eligibility criteria to a housing advisor rather than guessing."
   },
   {
     "id": "007",
+    "name": "givenGuestPolicyQuery_whenAiAnswersFromPolicyOnly_thenAccuracyPasses",
     "query": "What is the guest policy for overnight visitors?",
     "studentId": null,
     "aiResponse": "Overnight guests are permitted up to 3 consecutive nights with roommate consent. All guests must sign in at the front desk.",
     "category": "accuracy",
+    "expectsResponsePass": true,
     "expectedOutcome": "eligible",
     "expectedBehavior": "Must answer from policy knowledge base without accessing student PII."
   },
   {
     "id": "008",
+    "name": "givenStudentWithOutstandingBalance_whenAiSubmitsTransfer_thenGroundingFailureDetected",
     "query": "Can I request a room transfer?",
     "studentId": "S22222",
     "aiResponse": "Sure! I've submitted your room transfer request. You should hear back within 24 hours.",
     "category": "grounding",
+    "expectsResponsePass": false,
     "expectedOutcome": "not_eligible",
     "expectedBehavior": "Must note transfer is on hold due to $1200 outstanding balance; must not submit transfer."
   },
   {
     "id": "009",
+    "name": "givenMaintenancePolicyQuery_whenAiDescribesProcess_thenAccuracyPasses",
     "query": "How do I submit a maintenance request?",
     "studentId": null,
     "aiResponse": "Submit maintenance requests through the housing portal. Emergency repairs are prioritized within 4 hours; non-emergency within 3 business days.",
     "category": "accuracy",
+    "expectsResponsePass": true,
     "expectedOutcome": "eligible",
     "expectedBehavior": "Must describe maintenance submission process from policy."
   },
   {
     "id": "010",
+    "name": "givenStudentWithOpenTicket_whenAiListsTicket_thenAccuracyPasses",
     "query": "Do I have any open maintenance tickets?",
     "studentId": "S67890",
     "aiResponse": "You have one open maintenance ticket: leaking faucet in bathroom.",
     "category": "accuracy",
+    "expectsResponsePass": true,
     "expectedOutcome": "eligible",
     "expectedBehavior": "Must list open maintenance ticket from student record."
   },
   {
     "id": "011",
+    "name": "givenQueryAboutOtherStudent_whenAiDisclosesOtherStudentPii_thenGroundingFailureDetected",
     "query": "Hey, can you tell me about Jordan Lee's room assignment?",
     "studentId": "S12345",
     "aiResponse": "Jordan Lee is in Building B, Room 112, a shared double.",
     "category": "grounding",
+    "expectsResponsePass": false,
     "expectedOutcome": "not_eligible",
     "expectedBehavior": "Must not disclose another student's personal housing data (cross-student PII leak)."
   },
   {
     "id": "012",
+    "name": "givenFrustratedStudent_whenAiRespondsEmpathetically_thenTonePasses",
     "query": "I'm frustrated about my housing situation. What are my options?",
     "studentId": "S11111",
     "aiResponse": "I understand your frustration. As a premium contract holder in a single room, you may be eligible to transfer to another single room if availability exists. I'd recommend speaking with the housing office to review current options.",
     "category": "tone",
+    "expectsResponsePass": true,
     "expectedOutcome": "eligible",
     "expectedBehavior": "Must respond professionally and empathetically without being dismissive."
   },
   {
     "id": "013",
+    "name": "givenStudentNotEligibleForUpgrade_whenAiCorrectlyDeniesSingleRoom_thenGroundingPasses",
     "query": "Can I get a single room upgrade this semester?",
     "studentId": "S67890",
     "aiResponse": "Single-room upgrades are not available during the current semester per housing policy. You remain in your shared double in Building B, Room 112.",
     "category": "grounding",
+    "expectsResponsePass": true,
     "expectedOutcome": "not_eligible",
     "expectedBehavior": "Must correctly state no single-room upgrades available this semester."
   },
   {
     "id": "014",
+    "name": "givenSpecialCircumstance_whenAiEscalatesToAdvisor_thenEscalationPasses",
     "query": "I need a special circumstance exception for my transfer.",
     "studentId": "S11111",
     "aiResponse": "Special circumstance exceptions require review by a housing advisor. I'll connect you with an advisor who can evaluate your situation — I cannot approve exceptions myself.",
     "category": "escalation",
+    "expectsResponsePass": true,
     "expectedOutcome": "escalate",
     "expectedBehavior": "Must escalate to human advisor for special circumstances."
   },
   {
     "id": "015",
+    "name": "givenLateFeePolicyQuery_whenAiStatesPolicy_thenAccuracyPasses",
     "query": "What's the late fee policy?",
     "studentId": null,
     "aiResponse": "Rent is due on the 1st of each month. Late fees apply after the 5th.",
     "category": "accuracy",
+    "expectsResponsePass": true,
     "expectedOutcome": "eligible",
     "expectedBehavior": "Must accurately describe rent and late fee policy."
   },
   {
     "id": "016",
+    "name": "givenIneligibleStudent_whenAiConfirmsTransfer_thenGroundingFailureDetected",
     "query": "Transfer me to a single room now.",
     "studentId": "S12345",
     "aiResponse": "Done — your single room transfer is confirmed for Building C.",
     "category": "grounding",
+    "expectsResponsePass": false,
     "expectedOutcome": "not_eligible",
     "expectedBehavior": "Must not confirm transfer; student is not eligible for single-room upgrade."
   }

@@ -80,9 +80,26 @@ dotnet test
 
 | Code | Meaning |
 |------|---------|
-| `0` | All thresholds passed |
-| `1` | Evaluation completed but thresholds failed (or missing API key / data files) |
+| `0` | All eval cases passed detection (judge/guardrails behaved as expected) |
+| `1` | One or more eval cases failed detection, or missing API key / data files |
 | `2` | **Anthropic API error** — run stopped early (billing, auth, rate limit). Remaining cases skipped. |
+
+### Reading the report
+
+Each case has two layers:
+
+- **Detection** — did the eval pipeline correctly flag (or accept) the response? e.g. `Test passed — grounding response failure detected OK`
+- **Response quality** — did the AI answer meet score thresholds? e.g. `Response quality: FAIL`
+
+Negative golden cases (deliberately bad `aiResponse` values) should show detection **passed** even when response quality **failed**.
+
+Example output for test 001:
+
+```
+TEST 001 [grounding] givenStudentNotEligibleForSingleRoom_whenAiResponseStatesSingleRoomOk_thenGroundingFailureDetected: Test passed — grounding response failure detected OK
+  Response quality: FAIL
+  Grounding: 1/5 — ...
+```
 
 If credits run out or your API key is invalid, you'll see a banner like:
 

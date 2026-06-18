@@ -10,11 +10,11 @@ public class AssistantClient
     private readonly string _apiKey;
     private readonly string _model;
 
-    public AssistantClient(HttpClient httpClient, string apiKey, string model = "claude-sonnet-4-20250514")
+    public AssistantClient(HttpClient httpClient, string apiKey, string? model = null)
     {
         _httpClient = httpClient;
         _apiKey = apiKey;
-        _model = model;
+        _model = model ?? AnthropicSettings.GetModel();
     }
 
     public async Task<string> GenerateResponseAsync(string query, string retrievedContext, CancellationToken cancellationToken = default)
