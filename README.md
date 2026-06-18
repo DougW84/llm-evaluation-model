@@ -1,6 +1,6 @@
 # LLM Evaluation Pipeline (Portfolio Demo)
 
-A small C# console app demonstrating **Evaluation-Driven Development (EDD)** for a mock StarRez-style university housing assistant. It runs a set of tests through mock RAG retrieval, scores responses with an **LLM-as-judge**, applies deterministic guardrails, and gates on quality thresholds.
+A small C# console app demonstrating **Evaluation-Driven Development (EDD)** for a mock university housing assistant. It runs a set of tests through mock RAG retrieval, scores responses with an **LLM-as-judge**, applies deterministic guardrails, and gates on quality thresholds.
 
 ## What this demonstrates
 
